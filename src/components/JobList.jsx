@@ -9,6 +9,7 @@ const JobList = () => {
   const [jobs, setJobs] = useState([]);
   const [offset, setOffset] = useState(0);
   const [initialLoadComplete, setInitialLoadComplete] = useState(false);
+  const [totalJobs, setTotalJobs] = useState(0);
 
   useEffect(() => {
     getJobs();
@@ -28,10 +29,9 @@ const JobList = () => {
       const response = await fetch(JOBS_ENDPOINT, requestOptions);
       const data = await response.json();
 
+      setTotalJobs(data.totalCount);
       setOffset(offset + 10);
-
       setJobs(initialLoadComplete ? [...jobs, ...data.jdList] : data.jdList);
-
       setInitialLoadComplete(true);
     } catch (error) {
       console.error("Error fetching job listings:", error);
@@ -42,7 +42,7 @@ const JobList = () => {
     <InfiniteScroll
       pageStart={0}
       loadMore={getJobs}
-      hasMore={true}
+      hasMore={jobs.length < totalJobs}
       loader={
         <div
           key="loader"

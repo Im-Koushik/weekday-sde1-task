@@ -2,7 +2,17 @@
 import { Card, CardContent, Typography, Button, Box, Fab } from "@mui/material";
 
 const JobCard = ({ job }) => {
-  const { title, company, location, description, experience, applyLink } = job;
+  const {
+    jdLink,
+    jobDetailsFromCompany,
+    maxJdSalary,
+    minJdSalary,
+    salaryCurrencyCode,
+    location,
+    minExp,
+    maxExp,
+    jobRole,
+  } = job;
 
   return (
     <Card style={{ borderRadius: "20px", border: "1px solid lightgrey" }}>
@@ -16,9 +26,9 @@ const JobCard = ({ job }) => {
               letterSpacing={2}
               color="grey"
             >
-              {company}
+              Company
             </Typography>
-            <Typography variant="subtitle1">{title}</Typography>
+            <Typography variant="subtitle1">{jobRole || "Job Role"}</Typography>
           </Box>
         </Box>
         <Typography marginLeft="66px" variant="body2">
@@ -30,7 +40,8 @@ const JobCard = ({ job }) => {
           fontSize="14px"
           color="#37546D"
         >
-          Estimated Salary: $18 - 35 LPA ✅
+          Estimated Salary:{" "}
+          {`${salaryCurrencyCode || "$"}${minJdSalary} - ${maxJdSalary}`} LPA ✅
         </Typography>
         <Typography fontSize="1rem" fontWeight="semibold" lineHeight="1.5">
           About Company:
@@ -49,23 +60,7 @@ const JobCard = ({ job }) => {
               maxHeight: "200px",
             }}
           >
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Accusamus,
-            eaque corrupti ipsa dolorum repellat quasi cumque eos temporibus,
-            ratione recusandae autem cupiditate reiciendis doloribus ipsum,
-            facere dolore soluta. Nemo, quaerat? Lorem ipsum dolor sit amet
-            consectetur adipisicing elit. Deleniti ut temporibus animi! Eius
-            consequuntur eveniet culpa aspernatur laboriosam architecto quam
-            maxime voluptas, enim laborum amet minus facilis laudantium earum
-            molestias? Lorem ipsum dolor sit amet consectetur adipisicing elit.
-            Quo iste id quaerat amet, ullam iusto mollitia velit ut eaque.
-            Incidunt et eius animi consequatur. Neque, a. Nulla fuga blanditiis
-            odio? Lorem, ipsum dolor sit amet consectetur adipisicing elit.
-            Asperiores nemo incidunt dicta molestias! Alias consequatur tenetur
-            ex labore dolore excepturi dicta beatae qui a recusandae commodi, ad
-            distinctio sequi praesentium. Lorem ipsum dolor sit amet consectetur
-            adipisicing elit. Iusto neque repellat pariatur officia, veniam
-            ullam repellendus, autem quod modi sed porro hic eos optio nulla
-            soluta, ipsa quis! Sit, dolores.
+            {jobDetailsFromCompany}
           </Typography>
           <div
             style={{
@@ -88,6 +83,7 @@ const JobCard = ({ job }) => {
           }}
         >
           <Fab
+            href={jdLink}
             style={{
               whiteSpace: "nowrap",
               color: "blue",
@@ -110,7 +106,7 @@ const JobCard = ({ job }) => {
           >
             Minimum Experience
           </Typography>
-          <Typography variant="subtitle1">3 years</Typography>
+          <Typography variant="subtitle1">{minExp} years</Typography>
         </Box>
         <Button
           variant="contained"
@@ -123,7 +119,7 @@ const JobCard = ({ job }) => {
             fontWeight: "bold",
             marginTop: "0.5rem",
           }}
-          href={applyLink}
+          href={jdLink}
           target="_blank"
         >
           ⚡Easy Apply

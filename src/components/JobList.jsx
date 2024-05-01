@@ -1,100 +1,71 @@
-import { Grid } from "@mui/material";
+import { CircularProgress, Grid } from "@mui/material";
 import JobCard from "./JobCard";
+import { useEffect, useState } from "react";
+import InfiniteScroll from "react-infinite-scroller";
 
-const dummyJobs = [
-  {
-    id: 1,
-    title: "Frontend Developer",
-    company: "ABC Tech",
-    location: "New York, NY",
-    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-    experience: "2+ years",
-    applyLink: "#",
-  },
-  {
-    id: 2,
-    title: "Full Stack Developer",
-    company: "XYZ Solutions",
-    location: "San Francisco, CA",
-    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-    experience: "3+ years",
-    applyLink: "#",
-  },
-  {
-    id: 3,
-    title: "Full Stack Developer",
-    company: "XYZ Solutions",
-    location: "San Francisco, CA",
-    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-    experience: "3+ years",
-    applyLink: "#",
-  },
-  {
-    id: 4,
-    title: "Full Stack Developer",
-    company: "XYZ Solutions",
-    location: "San Francisco, CA",
-    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-    experience: "3+ years",
-    applyLink: "#",
-  },
-  {
-    id: 5,
-    title: "Full Stack Developer",
-    company: "XYZ Solutions",
-    location: "San Francisco, CA",
-    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-    experience: "3+ years",
-    applyLink: "#",
-  },
-  {
-    id: 6,
-    title: "Full Stack Developer",
-    company: "XYZ Solutions",
-    location: "San Francisco, CA",
-    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-    experience: "3+ years",
-    applyLink: "#",
-  },
-  {
-    id: 7,
-    title: "Full Stack Developer",
-    company: "XYZ Solutions",
-    location: "San Francisco, CA",
-    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-    experience: "3+ years",
-    applyLink: "#",
-  },
-];
+const JOBS_ENDPOINT = "https://api.weekday.technology/adhoc/getSampleJdJSON";
 
 const JobList = () => {
-  const myHeaders = new Headers();
-  myHeaders.append("Content-Type", "application/json");
+  const [jobs, setJobs] = useState([]);
+  const [offset, setOffset] = useState(0);
+  const [initialLoadComplete, setInitialLoadComplete] = useState(false);
 
-  const raw = JSON.stringify({
-    limit: 10,
-    offset: 0,
-  });
+  useEffect(() => {
+    getJobs();
+  }, []);
 
-  const requestOptions = {
-    method: "POST",
-    headers: myHeaders,
+  const getJobs = async () => {
+    try {
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+
+      const requestOptions = {
+        method: "POST",
+        headers: myHeaders,
+        body: JSON.stringify({ limit: 10, offset: offset }),
+      };
+
+      const response = await fetch(JOBS_ENDPOINT, requestOptions);
+      const data = await response.json();
+
+      setOffset(offset + 10);
+
+      setJobs(initialLoadComplete ? [...jobs, ...data.jdList] : data.jdList);
+
+      setInitialLoadComplete(true);
+    } catch (error) {
+      console.error("Error fetching job listings:", error);
+    }
   };
 
-  fetch("https://api.weekday.technology/adhoc/getSampleJdJSON", requestOptions)
-    .then((response) => response.json())
-    .then((result) => console.log(result));
   return (
-    <div>
-      <h2>Job Listings</h2>
-      <Grid container spacing={2}>
-        {dummyJobs.map((job) => (
-          <Grid item xs={12} sm={6} md={4} key={job.id}>
-            <JobCard job={job} />
-          </Grid>
-        ))}
-      </Grid>
-    </div>
+    <InfiniteScroll
+      pageStart={0}
+      loadMore={getJobs}
+      hasMore={true}
+      loader={
+        <div
+          key="loader"
+          style={{
+            display: "flex",
+            marginTop: "1rem",
+            justifyContent: "center",
+          }}
+        >
+          <CircularProgress />
+        </div>
+      }
+    >
+      <div key="job-list">
+        <Grid container spacing={2}>
+          {jobs.map((job) => (
+            <Grid item xs={12} sm={6} md={4} key={job.jdUid}>
+              <JobCard job={job} />
+            </Grid>
+          ))}
+        </Grid>
+      </div>
+    </InfiniteScroll>
   );
 };
 
